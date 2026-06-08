@@ -1,4 +1,4 @@
-# TFM - Predicción del antecedente de infarto de miocardio mediante aprendizaje automático sobre datos clínicos NHANES
+# TFM - Predicción del antecedente de infarto de miocardio mediante aprendizaje automático sobre datos clínicos NHANES.
 
 Este repositorio contiene el material computacional asociado al Trabajo de Fin de Máster titulado **“Predicción del antecedente de infarto de miocardio mediante aprendizaje automático sobre datos clínicos NHANES”**.
 
