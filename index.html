@@ -8184,13 +8184,201 @@ La distribución utilizada para el modelado se calcula después de excluir los r
 </div>
 </div>
 </div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=26bbbaa7-878e-4c98-8892-5c10102a88eb">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
+<h4 id="Tabla-Descriptiva-B%C3%A1sica-de-la-Cohorte-seg%C3%BAn-Antecedente-de-Infarto">Tabla Descriptiva Básica de la Cohorte según Antecedente de Infarto<a class="anchor-link" href="#Tabla-Descriptiva-B%C3%A1sica-de-la-Cohorte-seg%C3%BAn-Antecedente-de-Infarto">¶</a></h4>
+</div>
+</div>
+</div>
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=d3b6e333-8728-4308-ac22-75d68c96b573">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [8]:</div>
+<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="cm-editor cm-s-jupyter">
+<div class="highlight hl-ipython3"><pre><span></span><span class="c1"># Esta tabla complementa el análisis bivariante visual y resume el perfil clínico</span>
+<span class="c1"># de los participantes con y sin antecedente autorreportado de infarto.</span>
+
+<span class="n">df_perfil</span> <span class="o">=</span> <span class="n">df_raw</span><span class="p">[</span>
+    <span class="p">(</span><span class="n">df_raw</span><span class="p">[</span><span class="s1">'Edad'</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="mi">20</span><span class="p">)</span> <span class="o">&amp;</span>
+    <span class="p">(</span><span class="n">df_raw</span><span class="p">[</span><span class="s1">'Ataque_Corazon'</span><span class="p">]</span><span class="o">.</span><span class="n">isin</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">]))</span>
+<span class="p">]</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+
+<span class="n">df_perfil</span><span class="p">[</span><span class="s1">'Grupo_Antecedente_Infarto'</span><span class="p">]</span> <span class="o">=</span> <span class="n">df_perfil</span><span class="p">[</span><span class="s1">'Ataque_Corazon'</span><span class="p">]</span><span class="o">.</span><span class="n">replace</span><span class="p">({</span>
+    <span class="mi">2</span><span class="p">:</span> <span class="s1">'Sin antecedente'</span><span class="p">,</span>
+    <span class="mi">1</span><span class="p">:</span> <span class="s1">'Con antecedente'</span>
+<span class="p">})</span>
+
+<span class="n">orden_grupos</span> <span class="o">=</span> <span class="p">[</span><span class="s1">'Sin antecedente'</span><span class="p">,</span> <span class="s1">'Con antecedente'</span><span class="p">]</span>
+
+<span class="c1"># Códigos NHANES de no respuesta / no sabe / rechazo</span>
+<span class="n">codigos_no_validos</span> <span class="o">=</span> <span class="p">[</span><span class="mi">7</span><span class="p">,</span> <span class="mi">9</span><span class="p">,</span> <span class="mi">77</span><span class="p">,</span> <span class="mi">99</span><span class="p">]</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">media_grupo</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">variable</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">df</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s1">'Grupo_Antecedente_Infarto'</span><span class="p">)[</span><span class="n">variable</span><span class="p">]</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">porcentaje_codigo_valido</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">variable</span><span class="p">,</span> <span class="n">codigo_positivo</span><span class="p">):</span>
+    <span class="n">serie</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="n">variable</span><span class="p">]</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">codigos_no_validos</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">)</span>
+    <span class="n">tabla</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span>
+            <span class="s1">'Grupo_Antecedente_Infarto'</span><span class="p">:</span> <span class="n">df</span><span class="p">[</span><span class="s1">'Grupo_Antecedente_Infarto'</span><span class="p">],</span>
+            <span class="n">variable</span><span class="p">:</span> <span class="n">serie</span>
+        <span class="p">})</span>
+        <span class="o">.</span><span class="n">dropna</span><span class="p">(</span><span class="n">subset</span><span class="o">=</span><span class="p">[</span><span class="n">variable</span><span class="p">])</span>
+        <span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s1">'Grupo_Antecedente_Infarto'</span><span class="p">)[</span><span class="n">variable</span><span class="p">]</span>
+        <span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="p">(</span><span class="n">x</span> <span class="o">==</span> <span class="n">codigo_positivo</span><span class="p">)</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span> <span class="o">*</span> <span class="mi">100</span><span class="p">)</span>
+    <span class="p">)</span>
+    <span class="k">return</span> <span class="n">tabla</span>
+
+<span class="n">tabla_perfil</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">index</span><span class="o">=</span><span class="n">orden_grupos</span><span class="p">)</span>
+
+<span class="n">tabla_perfil</span><span class="p">[</span><span class="s1">'N'</span><span class="p">]</span> <span class="o">=</span> <span class="n">df_perfil</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s1">'Grupo_Antecedente_Infarto'</span><span class="p">)</span><span class="o">.</span><span class="n">size</span><span class="p">()</span>
+<span class="n">tabla_perfil</span><span class="p">[</span><span class="s1">'Edad media (años)'</span><span class="p">]</span> <span class="o">=</span> <span class="n">media_grupo</span><span class="p">(</span><span class="n">df_perfil</span><span class="p">,</span> <span class="s1">'Edad'</span><span class="p">)</span>
+<span class="n">tabla_perfil</span><span class="p">[</span><span class="s1">'Mujeres (%)'</span><span class="p">]</span> <span class="o">=</span> <span class="n">porcentaje_codigo_valido</span><span class="p">(</span><span class="n">df_perfil</span><span class="p">,</span> <span class="s1">'Genero'</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+<span class="n">tabla_perfil</span><span class="p">[</span><span class="s1">'IMC medio (kg/m²)'</span><span class="p">]</span> <span class="o">=</span> <span class="n">media_grupo</span><span class="p">(</span><span class="n">df_perfil</span><span class="p">,</span> <span class="s1">'IMC'</span><span class="p">)</span>
+<span class="n">tabla_perfil</span><span class="p">[</span><span class="s1">'Cintura media (cm)'</span><span class="p">]</span> <span class="o">=</span> <span class="n">media_grupo</span><span class="p">(</span><span class="n">df_perfil</span><span class="p">,</span> <span class="s1">'Circunferencia_Cintura'</span><span class="p">)</span>
+<span class="n">tabla_perfil</span><span class="p">[</span><span class="s1">'Presión sistólica media (mmHg)'</span><span class="p">]</span> <span class="o">=</span> <span class="n">media_grupo</span><span class="p">(</span><span class="n">df_perfil</span><span class="p">,</span> <span class="s1">'Presion_Sistolica'</span><span class="p">)</span>
+<span class="n">tabla_perfil</span><span class="p">[</span><span class="s1">'HbA1c media (%)'</span><span class="p">]</span> <span class="o">=</span> <span class="n">media_grupo</span><span class="p">(</span><span class="n">df_perfil</span><span class="p">,</span> <span class="s1">'Hemoglobina_Glicosilada'</span><span class="p">)</span>
+<span class="n">tabla_perfil</span><span class="p">[</span><span class="s1">'Diabetes diagnosticada (%)'</span><span class="p">]</span> <span class="o">=</span> <span class="n">porcentaje_codigo_valido</span><span class="p">(</span><span class="n">df_perfil</span><span class="p">,</span> <span class="s1">'Diabetes_Diagnosticada'</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+<span class="n">tabla_perfil</span><span class="p">[</span><span class="s1">'Fumador alguna vez (%)'</span><span class="p">]</span> <span class="o">=</span> <span class="n">porcentaje_codigo_valido</span><span class="p">(</span><span class="n">df_perfil</span><span class="p">,</span> <span class="s1">'Fumador'</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+<span class="n">tabla_perfil</span><span class="p">[</span><span class="s1">'Antecedente de derrame cerebral (%)'</span><span class="p">]</span> <span class="o">=</span> <span class="n">porcentaje_codigo_valido</span><span class="p">(</span><span class="n">df_perfil</span><span class="p">,</span> <span class="s1">'Derrame_Cerebral'</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+
+<span class="n">tabla_perfil</span> <span class="o">=</span> <span class="n">tabla_perfil</span><span class="o">.</span><span class="n">T</span>
+<span class="n">tabla_perfil</span> <span class="o">=</span> <span class="n">tabla_perfil</span><span class="p">[[</span><span class="s1">'Sin antecedente'</span><span class="p">,</span> <span class="s1">'Con antecedente'</span><span class="p">]]</span>
+
+<span class="c1"># Redondeo final para presentación</span>
+<span class="n">tabla_perfil</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="s1">'N'</span><span class="p">]</span> <span class="o">=</span> <span class="n">tabla_perfil</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="s1">'N'</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>
+<span class="n">tabla_perfil</span> <span class="o">=</span> <span class="n">tabla_perfil</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">"Tabla descriptiva básica de la cohorte según antecedente autorreportado de infarto"</span><span class="p">)</span>
+<span class="n">display</span><span class="p">(</span><span class="n">tabla_perfil</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell-outputWrapper">
+<div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
+</div>
+<div class="jp-OutputArea jp-Cell-outputArea">
+<div class="jp-OutputArea-child">
+<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
+<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
+<pre>Tabla descriptiva básica de la cohorte según antecedente autorreportado de infarto
+</pre>
+</div>
+</div>
+<div class="jp-OutputArea-child">
+<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
+<div class="jp-RenderedHTMLCommon jp-RenderedHTML jp-OutputArea-output" data-mime-type="text/html" tabindex="0">
+<div>
+<style scoped="">
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+<thead>
+<tr style="text-align: right;">
+<th></th>
+<th>Sin antecedente</th>
+<th>Con antecedente</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<th>N</th>
+<td>8786.0</td>
+<td>432.0</td>
+</tr>
+<tr>
+<th>Edad media (años)</th>
+<td>50.4</td>
+<td>66.7</td>
+</tr>
+<tr>
+<th>Mujeres (%)</th>
+<td>52.5</td>
+<td>30.3</td>
+</tr>
+<tr>
+<th>IMC medio (kg/m²)</th>
+<td>30.0</td>
+<td>30.8</td>
+</tr>
+<tr>
+<th>Cintura media (cm)</th>
+<td>100.7</td>
+<td>107.5</td>
+</tr>
+<tr>
+<th>Presión sistólica media (mmHg)</th>
+<td>124.5</td>
+<td>132.8</td>
+</tr>
+<tr>
+<th>HbA1c media (%)</th>
+<td>5.8</td>
+<td>6.4</td>
+</tr>
+<tr>
+<th>Diabetes diagnosticada (%)</th>
+<td>14.1</td>
+<td>41.2</td>
+</tr>
+<tr>
+<th>Fumador alguna vez (%)</th>
+<td>40.5</td>
+<td>65.7</td>
+</tr>
+<tr>
+<th>Antecedente de derrame cerebral (%)</th>
+<td>4.3</td>
+<td>25.9</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=90b6279a-289d-4b3e-b01d-ff494b024cb2">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [ ]:</div>
+<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="cm-editor cm-s-jupyter">
+<div class="highlight hl-ipython3"><pre><span></span> 
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+</div>
 <div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=86881821-d391-4bac-851b-e01612b4a0ac">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h5 id="%23%23%23%23%23-Matriz-de-correlaci%C3%B3n-de-Pearson-entre-variables-cl%C3%ADnicas-num%C3%A9ricas">##### Matriz de correlación de Pearson entre variables clínicas numéricas<a class="anchor-link" href="#%23%23%23%23%23-Matriz-de-correlaci%C3%B3n-de-Pearson-entre-variables-cl%C3%ADnicas-num%C3%A9ricas">¶</a></h5>
+<h5 id="Matriz-de-correlaci%C3%B3n-de-Pearson-entre-variables-cl%C3%ADnicas-num%C3%A9ricas">Matriz de correlación de Pearson entre variables clínicas numéricas<a class="anchor-link" href="#Matriz-de-correlaci%C3%B3n-de-Pearson-entre-variables-cl%C3%ADnicas-num%C3%A9ricas">¶</a></h5>
 </div>
 </div>
 </div>
@@ -8199,7 +8387,7 @@ La distribución utilizada para el modelado se calcula después de excluir los r
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [8]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In [9]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
 <div class="highlight hl-ipython3"><pre><span></span><span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">14</span><span class="p">,</span> <span class="mi">12</span><span class="p">))</span>
@@ -8252,7 +8440,7 @@ La distribución utilizada para el modelado se calcula después de excluir los r
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [9]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In [10]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
 <div class="highlight hl-ipython3"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
@@ -8661,17 +8849,14 @@ Datos de evaluación final (test): 2766 participantes.
 </div>
 </div>
 </div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=61a35908-1c4d-47f6-85d1-2bec0b3919b2">
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=91ad3ada-c29e-4c53-aa24-b43ccd8518ea">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
-<div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [ ]:</div>
-<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
-<div class="cm-editor cm-s-jupyter">
-<div class="highlight hl-ipython3"><pre><span></span> 
-</pre></div>
-</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
+<h4 id="Reglas-de-auditor%C3%ADa-de-valores-extremos:">Reglas de auditoría de valores extremos:<a class="anchor-link" href="#Reglas-de-auditor%C3%ADa-de-valores-extremos:">¶</a></h4><h5 id="IMC-%3C12-o-%3E70">IMC &lt;12 o &gt;70<a class="anchor-link" href="#IMC-%3C12-o-%3E70">¶</a></h5><h5 id="Presi%C3%B3n-sist%C3%B3lica-%3C70-o-%3E250">Presión sistólica &lt;70 o &gt;250<a class="anchor-link" href="#Presi%C3%B3n-sist%C3%B3lica-%3C70-o-%3E250">¶</a></h5><h5 id="Presi%C3%B3n-diast%C3%B3lica-%3C40-o-%3E150">Presión diastólica &lt;40 o &gt;150<a class="anchor-link" href="#Presi%C3%B3n-diast%C3%B3lica-%3C40-o-%3E150">¶</a></h5><h5 id="Colesterol-total-%3C50-o-%3E400">Colesterol total &lt;50 o &gt;400<a class="anchor-link" href="#Colesterol-total-%3C50-o-%3E400">¶</a></h5><h5 id="HDL-%3C10-o-%3E150">HDL &lt;10 o &gt;150<a class="anchor-link" href="#HDL-%3C10-o-%3E150">¶</a></h5><h5 id="HbA1c-%3C3,5-o-%3E15">HbA1c &lt;3,5 o &gt;15<a class="anchor-link" href="#HbA1c-%3C3,5-o-%3E15">¶</a></h5><h5 id="Peso-%3C30-o-%3E250">Peso &lt;30 o &gt;250<a class="anchor-link" href="#Peso-%3C30-o-%3E250">¶</a></h5><h5 id="Tratamiento:">Tratamiento:<a class="anchor-link" href="#Tratamiento:">¶</a></h5><h5 id="sin-reemplazo,-sin-truncamiento,-sin-exclusi%C3%B3n-en-an%C3%A1lisis-principal;">sin reemplazo, sin truncamiento, sin exclusión en análisis principal;<a class="anchor-link" href="#sin-reemplazo,-sin-truncamiento,-sin-exclusi%C3%B3n-en-an%C3%A1lisis-principal;">¶</a></h5><h5 id="evaluaci%C3%B3n-posterior-mediante-an%C3%A1lisis-de-sensibilidad.">evaluación posterior mediante análisis de sensibilidad.<a class="anchor-link" href="#evaluaci%C3%B3n-posterior-mediante-an%C3%A1lisis-de-sensibilidad.">¶</a></h5>
 </div>
 </div>
 </div>
@@ -8691,7 +8876,7 @@ Datos de evaluación final (test): 2766 participantes.
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [10]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In [11]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
 <div class="highlight hl-ipython3"><pre><span></span><span class="c1"># AUDITORÍA DE VALORES PERDIDOS TRAS LIMPIEZA CLÍNICA</span>
@@ -8922,7 +9107,7 @@ Variables con algún valor perdido: 15 de 21
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [11]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In [12]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
 <div class="highlight hl-ipython3"><pre><span></span><span class="c1"># COMPARACIÓN DE MISSING VALUES: DATASET BRUTO VS COHORTE FINAL</span>
@@ -9168,7 +9353,7 @@ Variables con algún valor perdido: 15 de 21
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [12]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In [13]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
 <div class="highlight hl-ipython3"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">sklearn.pipeline</span><span class="w"> </span><span class="kn">import</span> <span class="n">Pipeline</span>
@@ -9352,7 +9537,7 @@ Las columnas no incluidas explícitamente en vars_numericas o vars_categoricas s
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [13]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In [14]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
 <div class="highlight hl-ipython3"><pre><span></span><span class="c1"># RESUMEN GLOBAL DE MISSINGNESS EN PREDICTORES DEL MODELO</span>
@@ -9573,7 +9758,7 @@ Porcentaje medio de nulos en predictores: 6.41%
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [14]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In [15]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
 <div class="highlight hl-ipython3"><pre><span></span><span class="c1"># CLASIFICACIÓN DEL NIVEL DE MISSINGNESS EN PREDICTORES</span>
@@ -9818,7 +10003,7 @@ Porcentaje medio de nulos en predictores: 6.41%
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [15]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In [16]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
 <div class="highlight hl-ipython3"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">sklearn.model_selection</span><span class="w"> </span><span class="kn">import</span> <span class="n">cross_validate</span><span class="p">,</span> <span class="n">StratifiedKFold</span>
@@ -10073,7 +10258,7 @@ RESULTADOS DEL TORNEO:
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [16]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In [17]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
 <div class="highlight hl-ipython3"><pre><span></span><span class="c1"># GRÁFICA COMPARATIVA DEL TORNEO DE MODELOS</span>
@@ -10167,7 +10352,7 @@ Generando gráfica comparativa de modelos...
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [17]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In [18]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
 <div class="highlight hl-ipython3"><pre><span></span><span class="c1"># GRÁFICA COMPARATIVA DE AVERAGE PRECISION</span>
@@ -10250,7 +10435,7 @@ Generando gráfica comparativa de modelos...
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [18]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In [19]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
 <div class="highlight hl-ipython3"><pre><span></span><span class="c1"># BASELINE DE AVERAGE PRECISION POR PREVALENCIA</span>
@@ -10311,7 +10496,7 @@ Mejora relativa frente a prevalencia base: 4.90 veces
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [19]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In [20]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
 <div class="highlight hl-ipython3"><pre><span></span><span class="c1"># RANKING FINAL DEL TORNEO</span>
@@ -10434,7 +10619,7 @@ Mejora relativa frente a prevalencia base: 4.90 veces
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [20]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In [21]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
 <div class="highlight hl-ipython3"><pre><span></span><span class="c1"># SELECCIÓN DEL MODELO CANDIDATO</span>
@@ -10516,7 +10701,7 @@ La Regresión Logística se mantiene como candidata final por rendimiento, inter
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [21]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In [22]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
 <div class="highlight hl-ipython3"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">sklearn.model_selection</span><span class="w"> </span><span class="kn">import</span> <span class="n">GridSearchCV</span><span class="p">,</span> <span class="n">cross_val_predict</span>
@@ -11778,7 +11963,7 @@ Modelo calibrado final entrenado.
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [22]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In [23]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
 <div class="highlight hl-ipython3"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">sklearn.metrics</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
@@ -12095,7 +12280,7 @@ El VPN/NPV de 0.992 indica que los participantes clasificados como negativos pre
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h4 id="Interpretaci%C3%B3n-de-la-evaluaci%C3%B3n-final">Interpretación de la evaluación final<a class="anchor-link" href="#Interpretaci%C3%B3n-de-la-evaluaci%C3%B3n-final">¶</a></h4><h5 id="La-evaluaci%C3%B3n-final-se-realiza-una-%C3%BAnica-vez-sobre-el-conjunto-test,-una-vez-fijados-el-modelo,-los-hiperpar%C3%A1metros,-la-calibraci%C3%B3n-probabil%C3%ADstica-y-el-umbral-operativo-utilizando-%C3%BAnicamente-el-conjunto-de-entrenamiento.">La evaluación final se realiza una única vez sobre el conjunto test, una vez fijados el modelo, los hiperparámetros, la calibración probabilística y el umbral operativo utilizando únicamente el conjunto de entrenamiento.<a class="anchor-link" href="#La-evaluaci%C3%B3n-final-se-realiza-una-%C3%BAnica-vez-sobre-el-conjunto-test,-una-vez-fijados-el-modelo,-los-hiperpar%C3%A1metros,-la-calibraci%C3%B3n-probabil%C3%ADstica-y-el-umbral-operativo-utilizando-%C3%BAnicamente-el-conjunto-de-entrenamiento.">¶</a></h5><h5 id="El-modelo-muestra-buena-capacidad-discriminativa-global,-reflejada-en-el-AUC-ROC,-y-una-mejora-clara-en-Average-Precision-respecto-a-la-prevalencia-base-de-la-clase-positiva.-La-sensibilidad-elevada-indica-que-el-umbral-operativo-prioriza-el-rendimiento-sobre-la-clase-positiva,-a-costa-de-un-incremento-relevante-de-falsos-positivos.">El modelo muestra buena capacidad discriminativa global, reflejada en el AUC-ROC, y una mejora clara en Average Precision respecto a la prevalencia base de la clase positiva. La sensibilidad elevada indica que el umbral operativo prioriza el rendimiento sobre la clase positiva, a costa de un incremento relevante de falsos positivos.<a class="anchor-link" href="#El-modelo-muestra-buena-capacidad-discriminativa-global,-reflejada-en-el-AUC-ROC,-y-una-mejora-clara-en-Average-Precision-respecto-a-la-prevalencia-base-de-la-clase-positiva.-La-sensibilidad-elevada-indica-que-el-umbral-operativo-prioriza-el-rendimiento-sobre-la-clase-positiva,-a-costa-de-un-incremento-relevante-de-falsos-positivos.">¶</a></h5><h5 id="Sin-embargo,-el-valor-predictivo-positivo-es-bajo,-lo-cual-es-esperable-en-un-problema-con-baja-prevalencia.-Por-tanto,-el-modelo-debe-interpretarse-como-una-aproximaci%C3%B3n-exploratoria-de-clasificaci%C3%B3n-interna-del-antecedente-autorreportado-de-infarto-de-miocardio,-no-como-un-sistema-diagn%C3%B3stico,-una-herramienta-cl%C3%ADnica-de-cribado-ni-un-predictor-longitudinal-de-eventos-futuros.">Sin embargo, el valor predictivo positivo es bajo, lo cual es esperable en un problema con baja prevalencia. Por tanto, el modelo debe interpretarse como una aproximación exploratoria de clasificación interna del antecedente autorreportado de infarto de miocardio, no como un sistema diagnóstico, una herramienta clínica de cribado ni un predictor longitudinal de eventos futuros.<a class="anchor-link" href="#Sin-embargo,-el-valor-predictivo-positivo-es-bajo,-lo-cual-es-esperable-en-un-problema-con-baja-prevalencia.-Por-tanto,-el-modelo-debe-interpretarse-como-una-aproximaci%C3%B3n-exploratoria-de-clasificaci%C3%B3n-interna-del-antecedente-autorreportado-de-infarto-de-miocardio,-no-como-un-sistema-diagn%C3%B3stico,-una-herramienta-cl%C3%ADnica-de-cribado-ni-un-predictor-longitudinal-de-eventos-futuros.">¶</a></h5>
+<h4 id="Interpretaci%C3%B3n-de-la-evaluaci%C3%B3n-final">Interpretación de la evaluación final<a class="anchor-link" href="#Interpretaci%C3%B3n-de-la-evaluaci%C3%B3n-final">¶</a></h4><h5 id="La-evaluaci%C3%B3n-final-se-realiza-una-%C3%BAnica-vez-sobre-el-conjunto-test,-una-vez-fijados-el-modelo,-los-hiperpar%C3%A1metros,-la-calibraci%C3%B3n-probabil%C3%ADstica-y-el-umbral-operativo-utilizando-%C3%BAnicamente-el-conjunto-de-entrenamiento.">La evaluación final se realiza una única vez sobre el conjunto test, una vez fijados el modelo, los hiperparámetros, la calibración probabilística y el umbral operativo utilizando únicamente el conjunto de entrenamiento.<a class="anchor-link" href="#La-evaluaci%C3%B3n-final-se-realiza-una-%C3%BAnica-vez-sobre-el-conjunto-test,-una-vez-fijados-el-modelo,-los-hiperpar%C3%A1metros,-la-calibraci%C3%B3n-probabil%C3%ADstica-y-el-umbral-operativo-utilizando-%C3%BAnicamente-el-conjunto-de-entrenamiento.">¶</a></h5><h5 id="El-modelo-muestra-buena-capacidad-discriminativa-global,-reflejada-en-el-AUC-ROC,-y-una-mejora-clara-en-Average-Precision-respecto-a-la-prevalencia-base-de-la-clase-positiva.-La-sensibilidad-elevada-indica-que-el-umbral-operativo-prioriza-el-rendimiento-sobre-la-clase-positiva,-a-costa-de-un-incremento-relevante-de-falsos-positivos.">El modelo muestra buena capacidad discriminativa global, reflejada en el AUC-ROC, y una mejora clara en Average Precision respecto a la prevalencia base de la clase positiva. La sensibilidad elevada indica que el umbral operativo prioriza el rendimiento sobre la clase positiva, a costa de un incremento relevante de falsos positivos.<a class="anchor-link" href="#El-modelo-muestra-buena-capacidad-discriminativa-global,-reflejada-en-el-AUC-ROC,-y-una-mejora-clara-en-Average-Precision-respecto-a-la-prevalencia-base-de-la-clase-positiva.-La-sensibilidad-elevada-indica-que-el-umbral-operativo-prioriza-el-rendimiento-sobre-la-clase-positiva,-a-costa-de-un-incremento-relevante-de-falsos-positivos.">¶</a></h5><h5 id="Sin-embargo,-el-valor-predictivo-positivo-es-bajo,-lo-cual-es-esperable-en-un-problema-con-baja-prevalencia.-En-t%C3%A9rminos-pr%C3%A1cticos,-un-VPP-de-0,132-significa-que,-por-cada-100-participantes-clasificados-como-positivos-por-el-modelo,-aproximadamente-13-ser%C3%ADan-verdaderos-positivos-y-87-ser%C3%ADan-falsos-positivos.-Por-tanto,-el-modelo-debe-interpretarse-como-una-aproximaci%C3%B3n-exploratoria-de-clasificaci%C3%B3n-interna-del-antecedente-autorreportado-de-infarto-de-miocardio,-no-como-un-sistema-diagn%C3%B3stico,-una-herramienta-cl%C3%ADnica-de-cribado-ni-un-predictor-longitudinal-de-eventos-futuros.">Sin embargo, el valor predictivo positivo es bajo, lo cual es esperable en un problema con baja prevalencia. En términos prácticos, un VPP de 0,132 significa que, por cada 100 participantes clasificados como positivos por el modelo, aproximadamente 13 serían verdaderos positivos y 87 serían falsos positivos. Por tanto, el modelo debe interpretarse como una aproximación exploratoria de clasificación interna del antecedente autorreportado de infarto de miocardio, no como un sistema diagnóstico, una herramienta clínica de cribado ni un predictor longitudinal de eventos futuros.<a class="anchor-link" href="#Sin-embargo,-el-valor-predictivo-positivo-es-bajo,-lo-cual-es-esperable-en-un-problema-con-baja-prevalencia.-En-t%C3%A9rminos-pr%C3%A1cticos,-un-VPP-de-0,132-significa-que,-por-cada-100-participantes-clasificados-como-positivos-por-el-modelo,-aproximadamente-13-ser%C3%ADan-verdaderos-positivos-y-87-ser%C3%ADan-falsos-positivos.-Por-tanto,-el-modelo-debe-interpretarse-como-una-aproximaci%C3%B3n-exploratoria-de-clasificaci%C3%B3n-interna-del-antecedente-autorreportado-de-infarto-de-miocardio,-no-como-un-sistema-diagn%C3%B3stico,-una-herramienta-cl%C3%ADnica-de-cribado-ni-un-predictor-longitudinal-de-eventos-futuros.">¶</a></h5>
 </div>
 </div>
 </div>
@@ -12129,7 +12314,7 @@ El VPN/NPV de 0.992 indica que los participantes clasificados como negativos pre
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [23]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In [24]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
 <div class="highlight hl-ipython3"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">sklearn.metrics</span><span class="w"> </span><span class="kn">import</span> <span class="n">precision_recall_curve</span>
@@ -12307,7 +12492,7 @@ Generando curvas de evaluación final en test...
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [24]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In [25]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
 <div class="highlight hl-ipython3"><pre><span></span><span class="c1"># TABLA DE CALIBRACIÓN POR DECILES DE PROBABILIDAD</span>
@@ -12483,7 +12668,7 @@ Generando curvas de evaluación final en test...
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [25]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In [26]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
 <div class="highlight hl-ipython3"><pre><span></span><span class="c1"># GRÁFICO DE CALIBRACIÓN POR DECILES</span>
@@ -12559,7 +12744,7 @@ Generando curvas de evaluación final en test...
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [26]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In [27]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
 <div class="highlight hl-ipython3"><pre><span></span><span class="c1"># HISTOGRAMA DE PROBABILIDADES CALIBRADAS ESTIMADAS POR GRUPO</span>
@@ -12638,7 +12823,7 @@ Generando curvas de evaluación final en test...
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [27]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In [28]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
 <div class="highlight hl-ipython3"><pre><span></span><span class="c1"># RESUMEN AUTOMÁTICO DE LAS CURVAS DE EVALUACIÓN</span>
@@ -12732,7 +12917,7 @@ La distribución de probabilidades muestra el grado de solapamiento entre partic
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [28]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In [29]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
 <div class="highlight hl-ipython3"><pre><span></span><span class="c1"># INTERPRETABILIDAD POR COEFICIENTES DEL MODELO BASE</span>
@@ -13368,21 +13553,268 @@ En variables categóricas con más de dos niveles, la interpretación de cada co
 </div>
 </div>
 </div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=65f43d29-1949-4a74-8c22-93ed05b5b21e">
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=7bb5d7d3-2fc6-48db-bd91-cc4b2f3a3306">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
+<h4 id="Tabla-Interpretativa-con-ODDS-Ratios-e-IC-Bootstrap">Tabla Interpretativa con ODDS Ratios e IC Bootstrap<a class="anchor-link" href="#Tabla-Interpretativa-con-ODDS-Ratios-e-IC-Bootstrap">¶</a></h4>
+</div>
+</div>
+</div>
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=f2ec23ff-a651-4aca-b526-ab48b492597d">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [ ]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In [30]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
-<div class="highlight hl-ipython3"><pre><span></span> 
+<div class="highlight hl-ipython3"><pre><span></span><span class="c1"># Los intervalos se calculan sobre el modelo base de Regresión Logística,</span>
+<span class="c1"># condicionado a las columnas seleccionadas por RFECV y al preprocesamiento ya ajustado.</span>
+<span class="c1"># No deben interpretarse como intervalos causales ni como inferencia clínica independiente.</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">sklearn.base</span><span class="w"> </span><span class="kn">import</span> <span class="n">clone</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">"</span><span class="se">\n</span><span class="s2">--- TABLA INTERPRETATIVA DE COEFICIENTES, OR E IC BOOTSTRAP ---"</span><span class="p">)</span>
+
+<span class="n">X_train_preprocesado</span> <span class="o">=</span> <span class="n">preprocesador_interpretable</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">X_train</span><span class="p">)</span>
+<span class="n">X_train_seleccionado</span> <span class="o">=</span> <span class="n">selector_interpretable</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">X_train_preprocesado</span><span class="p">)</span>
+<span class="n">y_train_array</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">y_train</span><span class="p">)</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">seleccionar_filas</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">indices</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""</span>
+<span class="sd">    Selecciona filas por posición tanto si X es DataFrame como si es array/matriz.</span>
+<span class="sd">    """</span>
+    <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="s2">"iloc"</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">X</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">indices</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">X</span><span class="p">[</span><span class="n">indices</span><span class="p">]</span>
+
+<span class="n">rng</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">default_rng</span><span class="p">(</span><span class="mi">42</span><span class="p">)</span>
+<span class="n">n_boot_coef</span> <span class="o">=</span> <span class="mi">300</span>
+<span class="n">coeficientes_bootstrap</span> <span class="o">=</span> <span class="p">[]</span>
+
+<span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_boot_coef</span><span class="p">):</span>
+    <span class="n">indices_boot</span> <span class="o">=</span> <span class="n">rng</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span>
+        <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">y_train_array</span><span class="p">)),</span>
+        <span class="n">size</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">y_train_array</span><span class="p">),</span>
+        <span class="n">replace</span><span class="o">=</span><span class="kc">True</span>
+    <span class="p">)</span>
+
+    <span class="n">y_boot</span> <span class="o">=</span> <span class="n">y_train_array</span><span class="p">[</span><span class="n">indices_boot</span><span class="p">]</span>
+
+    <span class="c1"># Evitar muestras bootstrap degeneradas sin ambas clases</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">y_boot</span><span class="p">))</span> <span class="o">&lt;</span> <span class="mi">2</span><span class="p">:</span>
+        <span class="k">continue</span>
+
+    <span class="n">X_boot</span> <span class="o">=</span> <span class="n">seleccionar_filas</span><span class="p">(</span><span class="n">X_train_seleccionado</span><span class="p">,</span> <span class="n">indices_boot</span><span class="p">)</span>
+
+    <span class="n">modelo_boot</span> <span class="o">=</span> <span class="n">clone</span><span class="p">(</span><span class="n">modelo_logistico_interpretable</span><span class="p">)</span>
+    <span class="n">modelo_boot</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X_boot</span><span class="p">,</span> <span class="n">y_boot</span><span class="p">)</span>
+
+    <span class="n">coeficientes_bootstrap</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">modelo_boot</span><span class="o">.</span><span class="n">coef_</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+
+<span class="n">coeficientes_bootstrap</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">coeficientes_bootstrap</span><span class="p">)</span>
+
+<span class="n">coef_inf</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">percentile</span><span class="p">(</span><span class="n">coeficientes_bootstrap</span><span class="p">,</span> <span class="mf">2.5</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+<span class="n">coef_sup</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">percentile</span><span class="p">(</span><span class="n">coeficientes_bootstrap</span><span class="p">,</span> <span class="mf">97.5</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+
+<span class="n">df_ic_coeficientes</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span>
+    <span class="s1">'Columna técnica'</span><span class="p">:</span> <span class="n">columnas_modelo_final</span><span class="p">,</span>
+    <span class="s1">'Coeficiente IC95</span><span class="si">% i</span><span class="s1">nf. bootstrap'</span><span class="p">:</span> <span class="n">coef_inf</span><span class="p">,</span>
+    <span class="s1">'Coeficiente IC95</span><span class="si">% s</span><span class="s1">up. bootstrap'</span><span class="p">:</span> <span class="n">coef_sup</span><span class="p">,</span>
+    <span class="s1">'OR IC95</span><span class="si">% i</span><span class="s1">nf. bootstrap'</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">coef_inf</span><span class="p">),</span>
+    <span class="s1">'OR IC95</span><span class="si">% s</span><span class="s1">up. bootstrap'</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">coef_sup</span><span class="p">)</span>
+<span class="p">})</span>
+
+<span class="n">df_coeficientes_interpretacion</span> <span class="o">=</span> <span class="n">df_coeficientes</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span>
+    <span class="n">df_ic_coeficientes</span><span class="p">,</span>
+    <span class="n">on</span><span class="o">=</span><span class="s1">'Columna técnica'</span><span class="p">,</span>
+    <span class="n">how</span><span class="o">=</span><span class="s1">'left'</span>
+<span class="p">)</span>
+
+<span class="n">df_coeficientes_interpretacion</span><span class="p">[</span><span class="s1">'Signo'</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span>
+    <span class="n">df_coeficientes_interpretacion</span><span class="p">[</span><span class="s1">'Coeficiente'</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">,</span>
+    <span class="s1">'Positivo'</span><span class="p">,</span>
+    <span class="s1">'Negativo'</span>
+<span class="p">)</span>
+
+<span class="n">df_coeficientes_interpretacion</span><span class="p">[</span><span class="s1">'IC95% OR bootstrap'</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
+    <span class="n">df_coeficientes_interpretacion</span><span class="p">[</span><span class="s1">'OR IC95</span><span class="si">% i</span><span class="s1">nf. bootstrap'</span><span class="p">]</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">str</span><span class="p">)</span>
+    <span class="o">+</span> <span class="s1">'–'</span>
+    <span class="o">+</span> <span class="n">df_coeficientes_interpretacion</span><span class="p">[</span><span class="s1">'OR IC95</span><span class="si">% s</span><span class="s1">up. bootstrap'</span><span class="p">]</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">str</span><span class="p">)</span>
+<span class="p">)</span>
+
+<span class="n">lectura_clinica</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s1">'Edad'</span><span class="p">:</span> <span class="s1">'Coherente con mayor carga cardiovascular acumulada con la edad.'</span><span class="p">,</span>
+    <span class="s1">'Diabetes diagnosticada'</span><span class="p">:</span> <span class="s1">'Coherente con el perfil cardiometabólico asociado a enfermedad cardiovascular.'</span><span class="p">,</span>
+    <span class="s1">'No fumador'</span><span class="p">:</span> <span class="s1">'La ausencia de tabaquismo se asocia con menor tendencia hacia la clase positiva.'</span><span class="p">,</span>
+    <span class="s1">'Mujer'</span><span class="p">:</span> <span class="s1">'Lectura prudente; puede reflejar diferencias de sexo/género, prevalencia y autorreporte.'</span><span class="p">,</span>
+    <span class="s1">'Sin antecedente de ictus'</span><span class="p">:</span> <span class="s1">'Coherente de forma complementaria con menor carga vascular declarada.'</span><span class="p">,</span>
+    <span class="s1">'Diabetes borderline'</span><span class="p">:</span> <span class="s1">'Señal secundaria; interpretar con cautela por la categoría intermedia.'</span><span class="p">,</span>
+    <span class="s1">'Sin antecedente de asma'</span><span class="p">:</span> <span class="s1">'Señal secundaria; no debe interpretarse como efecto causal.'</span><span class="p">,</span>
+    <span class="s1">'Educación: estudios superiores no universitarios'</span><span class="p">:</span> <span class="s1">'Variable socioeducativa; interpretación exploratoria.'</span><span class="p">,</span>
+    <span class="s1">'Educación: 9º-11º grado'</span><span class="p">:</span> <span class="s1">'Variable socioeducativa; interpretación exploratoria.'</span><span class="p">,</span>
+    <span class="s1">'Colesterol total'</span><span class="p">:</span> <span class="s1">'Asociación interna condicionada por el resto de variables y el tratamiento posterior al evento.'</span><span class="p">,</span>
+    <span class="s1">'Ratio ingresos/pobreza'</span><span class="p">:</span> <span class="s1">'Indicador socioeconómico; lectura exploratoria y no causal.'</span><span class="p">,</span>
+    <span class="s1">'Colesterol HDL'</span><span class="p">:</span> <span class="s1">'Coherente en dirección protectora, aunque condicionado por el modelo multivariable.'</span><span class="p">,</span>
+    <span class="s1">'Etnia: afroamericano no hispano'</span><span class="p">:</span> <span class="s1">'Lectura exploratoria; no debe interpretarse como efecto biológico.'</span><span class="p">,</span>
+    <span class="s1">'Etnia: caucásico no hispano'</span><span class="p">:</span> <span class="s1">'Lectura exploratoria; no debe interpretarse como efecto biológico.'</span>
+<span class="p">}</span>
+
+<span class="n">df_coeficientes_interpretacion</span><span class="p">[</span><span class="s1">'Lectura prudente'</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
+    <span class="n">df_coeficientes_interpretacion</span><span class="p">[</span><span class="s1">'Variable interpretable'</span><span class="p">]</span>
+    <span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="n">lectura_clinica</span><span class="p">)</span>
+    <span class="o">.</span><span class="n">fillna</span><span class="p">(</span><span class="s1">'Asociación interna del modelo; interpretación exploratoria.'</span><span class="p">)</span>
+<span class="p">)</span>
+
+<span class="n">tabla_coeficientes_memoria</span> <span class="o">=</span> <span class="n">df_coeficientes_interpretacion</span><span class="o">.</span><span class="n">head</span><span class="p">(</span><span class="mi">8</span><span class="p">)[[</span>
+    <span class="s1">'Variable interpretable'</span><span class="p">,</span>
+    <span class="s1">'Signo'</span><span class="p">,</span>
+    <span class="s1">'Coeficiente'</span><span class="p">,</span>
+    <span class="s1">'Odds Ratio exp(coef)'</span><span class="p">,</span>
+    <span class="s1">'IC95% OR bootstrap'</span><span class="p">,</span>
+    <span class="s1">'Lectura prudente'</span>
+<span class="p">]]</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+
+<span class="n">tabla_coeficientes_memoria</span> <span class="o">=</span> <span class="n">tabla_coeficientes_memoria</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="p">{</span>
+    <span class="s1">'Variable interpretable'</span><span class="p">:</span> <span class="s1">'Variable'</span><span class="p">,</span>
+    <span class="s1">'Odds Ratio exp(coef)'</span><span class="p">:</span> <span class="s1">'OR exp(coef)'</span>
+<span class="p">})</span>
+
+<span class="n">display</span><span class="p">(</span><span class="n">tabla_coeficientes_memoria</span><span class="o">.</span><span class="n">round</span><span class="p">({</span>
+    <span class="s1">'Coeficiente'</span><span class="p">:</span> <span class="mi">3</span><span class="p">,</span>
+    <span class="s1">'OR exp(coef)'</span><span class="p">:</span> <span class="mi">2</span>
+<span class="p">}))</span>
 </pre></div>
 </div>
 </div>
 </div>
 </div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=f2ec23ff-a651-4aca-b526-ab48b492597d">
+<div class="jp-Cell-outputWrapper">
+<div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
+</div>
+<div class="jp-OutputArea jp-Cell-outputArea">
+<div class="jp-OutputArea-child">
+<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
+<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
+<pre>
+--- TABLA INTERPRETATIVA DE COEFICIENTES, OR E IC BOOTSTRAP ---
+</pre>
+</div>
+</div>
+<div class="jp-OutputArea-child">
+<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
+<div class="jp-RenderedHTMLCommon jp-RenderedHTML jp-OutputArea-output" data-mime-type="text/html" tabindex="0">
+<div>
+<style scoped="">
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+<thead>
+<tr style="text-align: right;">
+<th></th>
+<th>Variable</th>
+<th>Signo</th>
+<th>Coeficiente</th>
+<th>OR exp(coef)</th>
+<th>IC95% OR bootstrap</th>
+<th>Lectura prudente</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<th>0</th>
+<td>Sin antecedente de ictus</td>
+<td>Negativo</td>
+<td>-1.374</td>
+<td>0.25</td>
+<td>0.18–0.38</td>
+<td>Coherente de forma complementaria con menor ca...</td>
+</tr>
+<tr>
+<th>1</th>
+<td>Edad</td>
+<td>Positivo</td>
+<td>1.209</td>
+<td>3.35</td>
+<td>2.91–4.01</td>
+<td>Coherente con mayor carga cardiovascular acumu...</td>
+</tr>
+<tr>
+<th>2</th>
+<td>Diabetes diagnosticada</td>
+<td>Positivo</td>
+<td>0.692</td>
+<td>2.00</td>
+<td>1.43–2.64</td>
+<td>Coherente con el perfil cardiometabólico asoci...</td>
+</tr>
+<tr>
+<th>3</th>
+<td>No fumador</td>
+<td>Negativo</td>
+<td>-0.686</td>
+<td>0.50</td>
+<td>0.38–0.67</td>
+<td>La ausencia de tabaquismo se asocia con menor ...</td>
+</tr>
+<tr>
+<th>4</th>
+<td>Mujer</td>
+<td>Negativo</td>
+<td>-0.618</td>
+<td>0.54</td>
+<td>0.38–0.72</td>
+<td>Lectura prudente; puede reflejar diferencias d...</td>
+</tr>
+<tr>
+<th>5</th>
+<td>Diabetes borderline</td>
+<td>Negativo</td>
+<td>-0.606</td>
+<td>0.55</td>
+<td>0.27–0.94</td>
+<td>Señal secundaria; interpretar con cautela por ...</td>
+</tr>
+<tr>
+<th>6</th>
+<td>Sin antecedente de asma</td>
+<td>Negativo</td>
+<td>-0.398</td>
+<td>0.67</td>
+<td>0.48–0.97</td>
+<td>Señal secundaria; no debe interpretarse como e...</td>
+</tr>
+<tr>
+<th>7</th>
+<td>Educación: estudios superiores no universitarios</td>
+<td>Positivo</td>
+<td>0.362</td>
+<td>1.44</td>
+<td>1.1–2.0</td>
+<td>Variable socioeducativa; interpretación explor...</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=2225df8a-4286-49ae-a6d2-1370960796bb">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -13412,7 +13844,7 @@ En variables categóricas con más de dos niveles, la interpretación de cada co
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [29]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In [31]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
 <div class="highlight hl-ipython3"><pre><span></span><span class="c1"># ANÁLISIS DE EQUIDAD / FAIRNESS POR SUBGRUPOS</span>
@@ -14014,6 +14446,311 @@ Diferencia máxima de FPR: 0.683
 </div>
 </div>
 </div>
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=dbdde154-6e04-4b4a-8796-cf168db54cff">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
+<h4 id="An%C3%A1lisis-Exploratorio-por-Nivel-Socioecon%C3%B3mico">Análisis Exploratorio por Nivel Socioeconómico<a class="anchor-link" href="#An%C3%A1lisis-Exploratorio-por-Nivel-Socioecon%C3%B3mico">¶</a></h4>
+</div>
+</div>
+</div>
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=e7b20072-9527-4056-a624-442f308add7b">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [32]:</div>
+<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="cm-editor cm-s-jupyter">
+<div class="highlight hl-ipython3"><pre><span></span><span class="c1"># Se utiliza Ratio_Ingresos_Pobreza como aproximación socioeconómica disponible en NHANES.</span>
+<span class="c1"># El análisis se realiza sobre test, con el mismo modelo calibrado y el mismo umbral operativo.</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">"</span><span class="se">\n</span><span class="s2">--- ANÁLISIS EXPLORATORIO POR NIVEL SOCIOECONÓMICO ---"</span><span class="p">)</span>
+
+<span class="n">df_test_equidad_ses</span> <span class="o">=</span> <span class="n">df_test_equidad</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+
+<span class="c1"># Crear categorías socioeconómicas por terciles sobre valores disponibles en test.</span>
+<span class="c1"># Los valores ausentes se mantienen como categoría separada para no ocultar pérdida de información.</span>
+<span class="n">df_test_equidad_ses</span><span class="p">[</span><span class="s1">'Grupo nivel socioeconómico'</span><span class="p">]</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">qcut</span><span class="p">(</span>
+    <span class="n">df_test_equidad_ses</span><span class="p">[</span><span class="s1">'Ratio_Ingresos_Pobreza'</span><span class="p">],</span>
+    <span class="n">q</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span>
+    <span class="n">labels</span><span class="o">=</span><span class="p">[</span><span class="s1">'Bajo'</span><span class="p">,</span> <span class="s1">'Medio'</span><span class="p">,</span> <span class="s1">'Alto'</span><span class="p">],</span>
+    <span class="n">duplicates</span><span class="o">=</span><span class="s1">'drop'</span>
+<span class="p">)</span>
+
+<span class="n">df_test_equidad_ses</span><span class="p">[</span><span class="s1">'Grupo nivel socioeconómico'</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
+    <span class="n">df_test_equidad_ses</span><span class="p">[</span><span class="s1">'Grupo nivel socioeconómico'</span><span class="p">]</span>
+    <span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s1">'object'</span><span class="p">)</span>
+    <span class="o">.</span><span class="n">fillna</span><span class="p">(</span><span class="s1">'No disponible'</span><span class="p">)</span>
+<span class="p">)</span>
+
+<span class="n">orden_ses</span> <span class="o">=</span> <span class="p">[</span><span class="s1">'Bajo'</span><span class="p">,</span> <span class="s1">'Medio'</span><span class="p">,</span> <span class="s1">'Alto'</span><span class="p">,</span> <span class="s1">'No disponible'</span><span class="p">]</span>
+
+<span class="n">resultados_ses</span> <span class="o">=</span> <span class="p">[]</span>
+
+<span class="k">for</span> <span class="n">grupo</span><span class="p">,</span> <span class="n">datos_grupo</span> <span class="ow">in</span> <span class="n">df_test_equidad_ses</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s1">'Grupo nivel socioeconómico'</span><span class="p">):</span>
+    <span class="n">metricas</span> <span class="o">=</span> <span class="n">calcular_metricas_subgrupo</span><span class="p">(</span>
+        <span class="n">y_real</span><span class="o">=</span><span class="n">datos_grupo</span><span class="p">[</span><span class="s1">'y_real'</span><span class="p">],</span>
+        <span class="n">y_prob</span><span class="o">=</span><span class="n">datos_grupo</span><span class="p">[</span><span class="s1">'probabilidad_predicha'</span><span class="p">],</span>
+        <span class="n">umbral</span><span class="o">=</span><span class="n">umbral_clinico</span>
+    <span class="p">)</span>
+
+    <span class="n">metricas</span><span class="p">[</span><span class="s1">'Subgrupo'</span><span class="p">]</span> <span class="o">=</span> <span class="n">grupo</span>
+    <span class="n">resultados_ses</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">metricas</span><span class="p">)</span>
+
+<span class="n">tabla_equidad_ses</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">resultados_ses</span><span class="p">)</span>
+
+<span class="n">tabla_equidad_ses</span><span class="p">[</span><span class="s1">'Subgrupo'</span><span class="p">]</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">Categorical</span><span class="p">(</span>
+    <span class="n">tabla_equidad_ses</span><span class="p">[</span><span class="s1">'Subgrupo'</span><span class="p">],</span>
+    <span class="n">categories</span><span class="o">=</span><span class="n">orden_ses</span><span class="p">,</span>
+    <span class="n">ordered</span><span class="o">=</span><span class="kc">True</span>
+<span class="p">)</span>
+
+<span class="n">tabla_equidad_ses</span> <span class="o">=</span> <span class="n">tabla_equidad_ses</span><span class="o">.</span><span class="n">sort_values</span><span class="p">(</span><span class="s1">'Subgrupo'</span><span class="p">)</span>
+
+<span class="n">tabla_equidad_ses</span> <span class="o">=</span> <span class="n">tabla_equidad_ses</span><span class="p">[</span>
+    <span class="p">[</span><span class="s1">'Subgrupo'</span><span class="p">,</span> <span class="s1">'N total'</span><span class="p">,</span> <span class="s1">'Casos con antecedente'</span><span class="p">,</span> <span class="s1">'Prevalencia antecedente (%)'</span><span class="p">,</span>
+     <span class="s1">'AUC-ROC'</span><span class="p">,</span> <span class="s1">'Average Precision'</span><span class="p">,</span> <span class="s1">'Sensibilidad'</span><span class="p">,</span> <span class="s1">'Especificidad'</span><span class="p">,</span>
+     <span class="s1">'VPP / PPV'</span><span class="p">,</span> <span class="s1">'VPN / NPV'</span><span class="p">,</span> <span class="s1">'FPR'</span><span class="p">,</span> <span class="s1">'FNR'</span><span class="p">,</span>
+     <span class="s1">'Clasificados positivos (%)'</span><span class="p">,</span> <span class="s1">'TP'</span><span class="p">,</span> <span class="s1">'FP'</span><span class="p">,</span> <span class="s1">'FN'</span><span class="p">,</span> <span class="s1">'TN'</span><span class="p">]</span>
+<span class="p">]</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">"</span><span class="se">\n</span><span class="s2">--- TABLA DE EQUIDAD POR NIVEL SOCIOECONÓMICO ---"</span><span class="p">)</span>
+<span class="n">display</span><span class="p">(</span><span class="n">tabla_equidad_ses</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="mi">3</span><span class="p">))</span>
+
+<span class="n">advertir_subgrupos_pequenos</span><span class="p">(</span>
+    <span class="n">tabla_equidad_ses</span><span class="p">,</span>
+    <span class="s2">"equidad por nivel socioeconómico"</span><span class="p">,</span>
+    <span class="n">minimo_positivos</span><span class="o">=</span><span class="mi">30</span>
+<span class="p">)</span>
+
+<span class="k">if</span> <span class="n">tabla_equidad_ses</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="mi">2</span><span class="p">:</span>
+    <span class="n">diferencia_sens_ses</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="n">tabla_equidad_ses</span><span class="p">[</span><span class="s1">'Sensibilidad'</span><span class="p">]</span><span class="o">.</span><span class="n">max</span><span class="p">()</span>
+        <span class="o">-</span> <span class="n">tabla_equidad_ses</span><span class="p">[</span><span class="s1">'Sensibilidad'</span><span class="p">]</span><span class="o">.</span><span class="n">min</span><span class="p">()</span>
+    <span class="p">)</span>
+
+    <span class="n">diferencia_fpr_ses</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="n">tabla_equidad_ses</span><span class="p">[</span><span class="s1">'FPR'</span><span class="p">]</span><span class="o">.</span><span class="n">max</span><span class="p">()</span>
+        <span class="o">-</span> <span class="n">tabla_equidad_ses</span><span class="p">[</span><span class="s1">'FPR'</span><span class="p">]</span><span class="o">.</span><span class="n">min</span><span class="p">()</span>
+    <span class="p">)</span>
+
+    <span class="nb">print</span><span class="p">(</span><span class="s2">"</span><span class="se">\n</span><span class="s2">--- DIFERENCIAS ENTRE GRUPOS SOCIOECONÓMICOS ---"</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Diferencia máxima de sensibilidad: </span><span class="si">{</span><span class="n">diferencia_sens_ses</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Diferencia máxima de FPR: </span><span class="si">{</span><span class="n">diferencia_fpr_ses</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell-outputWrapper">
+<div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
+</div>
+<div class="jp-OutputArea jp-Cell-outputArea">
+<div class="jp-OutputArea-child">
+<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
+<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
+<pre>
+--- ANÁLISIS EXPLORATORIO POR NIVEL SOCIOECONÓMICO ---
+
+--- TABLA DE EQUIDAD POR NIVEL SOCIOECONÓMICO ---
+</pre>
+</div>
+</div>
+<div class="jp-OutputArea-child">
+<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
+<div class="jp-RenderedHTMLCommon jp-RenderedHTML jp-OutputArea-output" data-mime-type="text/html" tabindex="0">
+<div>
+<style scoped="">
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+<thead>
+<tr style="text-align: right;">
+<th></th>
+<th>Subgrupo</th>
+<th>N total</th>
+<th>Casos con antecedente</th>
+<th>Prevalencia antecedente (%)</th>
+<th>AUC-ROC</th>
+<th>Average Precision</th>
+<th>Sensibilidad</th>
+<th>Especificidad</th>
+<th>VPP / PPV</th>
+<th>VPN / NPV</th>
+<th>FPR</th>
+<th>FNR</th>
+<th>Clasificados positivos (%)</th>
+<th>TP</th>
+<th>FP</th>
+<th>FN</th>
+<th>TN</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<th>1</th>
+<td>Bajo</td>
+<td>786</td>
+<td>51</td>
+<td>6.489</td>
+<td>0.843</td>
+<td>0.213</td>
+<td>0.941</td>
+<td>0.663</td>
+<td>0.162</td>
+<td>0.994</td>
+<td>0.337</td>
+<td>0.059</td>
+<td>37.659</td>
+<td>48</td>
+<td>248</td>
+<td>3</td>
+<td>487</td>
+</tr>
+<tr>
+<th>2</th>
+<td>Medio</td>
+<td>775</td>
+<td>38</td>
+<td>4.903</td>
+<td>0.866</td>
+<td>0.247</td>
+<td>0.895</td>
+<td>0.704</td>
+<td>0.135</td>
+<td>0.992</td>
+<td>0.296</td>
+<td>0.105</td>
+<td>32.516</td>
+<td>34</td>
+<td>218</td>
+<td>4</td>
+<td>519</td>
+</tr>
+<tr>
+<th>0</th>
+<td>Alto</td>
+<td>778</td>
+<td>22</td>
+<td>2.828</td>
+<td>0.867</td>
+<td>0.135</td>
+<td>0.818</td>
+<td>0.787</td>
+<td>0.101</td>
+<td>0.993</td>
+<td>0.213</td>
+<td>0.182</td>
+<td>23.008</td>
+<td>18</td>
+<td>161</td>
+<td>4</td>
+<td>595</td>
+</tr>
+<tr>
+<th>3</th>
+<td>No disponible</td>
+<td>427</td>
+<td>19</td>
+<td>4.450</td>
+<td>0.826</td>
+<td>0.203</td>
+<td>0.789</td>
+<td>0.676</td>
+<td>0.102</td>
+<td>0.986</td>
+<td>0.324</td>
+<td>0.211</td>
+<td>34.426</td>
+<td>15</td>
+<td>132</td>
+<td>4</td>
+<td>276</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<div class="jp-OutputArea-child">
+<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
+<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
+<pre>
+Advertencia en equidad por nivel socioeconómico:
+Los siguientes subgrupos tienen menos de 30 casos con antecedente. Sus métricas pueden ser inestables:
+</pre>
+</div>
+</div>
+<div class="jp-OutputArea-child">
+<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
+<div class="jp-RenderedHTMLCommon jp-RenderedHTML jp-OutputArea-output" data-mime-type="text/html" tabindex="0">
+<div>
+<style scoped="">
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+<thead>
+<tr style="text-align: right;">
+<th></th>
+<th>Subgrupo</th>
+<th>N total</th>
+<th>Casos con antecedente</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<th>0</th>
+<td>Alto</td>
+<td>778</td>
+<td>22</td>
+</tr>
+<tr>
+<th>3</th>
+<td>No disponible</td>
+<td>427</td>
+<td>19</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<div class="jp-OutputArea-child">
+<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
+<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
+<pre>
+--- DIFERENCIAS ENTRE GRUPOS SOCIOECONÓMICOS ---
+Diferencia máxima de sensibilidad: 0.152
+Diferencia máxima de FPR: 0.124
+</pre>
+</div>
+</div>
+</div>
+</div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=1a3b29b9-c500-49c3-b273-c19b90aee9ca">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
@@ -14033,7 +14770,7 @@ Diferencia máxima de FPR: 0.683
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [30]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In [33]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
 <div class="highlight hl-ipython3"><pre><span></span><span class="c1"># INTERVALOS DE CONFIANZA BOOTSTRAP PARA MÉTRICAS FINALES</span>
@@ -14276,7 +15013,7 @@ Casos sin antecedente en test: 2636
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [31]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In [34]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
 <div class="highlight hl-ipython3"><pre><span></span><span class="c1"># TABLA FINAL: MÉTRICAS PUNTUALES + IC 95% BOOTSTRAP</span>
@@ -14445,7 +15182,7 @@ Casos sin antecedente en test: 2636
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [32]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In [35]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
 <div class="highlight hl-ipython3"><pre><span></span><span class="c1"># GRÁFICO DE INTERVALOS DE CONFIANZA BOOTSTRAP</span>
@@ -14520,7 +15257,7 @@ Casos sin antecedente en test: 2636
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [33]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In [36]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
 <div class="highlight hl-ipython3"><pre><span></span><span class="c1"># RESUMEN AUTOMÁTICO DE INCERTIDUMBRE</span>
@@ -14588,7 +15325,7 @@ VPP / PPV: 0.132 (IC95%: 0.122 - 0.142)
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [34]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In [37]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
 <div class="highlight hl-ipython3"><pre><span></span><span class="c1"># ANÁLISIS DE SENSIBILIDAD: EXCLUSIÓN DE VALORES EXTREMOS</span>
@@ -14785,7 +15522,7 @@ Participantes excluidos en sensibilidad: 25
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [35]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In [38]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
 <div class="highlight hl-ipython3"><pre><span></span><span class="c1"># EXPORTACIÓN DE DATOS PARA VALIDACIÓN COMPLEMENTARIA EN SAS</span>
